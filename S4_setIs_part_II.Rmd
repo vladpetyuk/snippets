@@ -1,0 +1,59 @@
+---
+title: "S4 setIs(.) Part II"
+output: html_document
+---
+
+`setIs` function is a way to establish relationship between the S4 classes.
+If the superclass has less slots and coversely subclass contains additional 
+information (that is slots), then establishing inheritance with `setIs` is
+seamless.  How about the situation when superclass-to-be contains more slots
+then subclass-to-be?
+```{r}
+# To be superclass.
+setClass("A", slots=c(x="numeric", y="character"))
+# To be subclass.  Note the slot @y is not present.
+setClass("B", slots=c(x="numeric"))
+```
+Attempt to set `B` as subclass of `A` results in an error.
+```{r, error=TRUE}
+setIs("B", "A")  
+```
+Obviously coercion from one class to another won't work either.
+```{r, error=TRUE}
+instA <- new("A", x=1, y="b")
+instB <- new("B", x=2)
+as(instA, "B")
+as(instB, "A")
+```
+It needs a coerce and a replace functions. The coerce function 
+is kind of obvious, it just needs to tell what to do with this new slot @y.
+The replace, however, is a bit less obvious.  It does not casts the object to the 
+superclass, but replaces the parts corresponding to the superclass by the 
+assigned `<-` value.
+```{r}
+setIs("B", "A",
+      coerce = function(obj) {out <- new("A"); out@x <- obj@x; out@y='dummy'; out},
+      replace = function(obj, value) {obj@x <- value@x; obj})
+
+```
+The relationship between the classes has been established. 
+`B` extends (or `is`) `A`, but not the other way around.
+```{r, error=TRUE}
+extends("B","A")
+is(instB,"A")
+extends("A","B")
+is(instA,"B")
+```
+Let's see how the coerce works now.
+```{r}
+as(instA, "B")
+as(instB, "A")
+```
+The replace
+```{r}
+show(instB)
+anotherA <- new("A", x=55, y="abc")
+as(instB, "A") <- anotherA
+show(instB)
+```
+
