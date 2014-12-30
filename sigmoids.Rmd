@@ -1,8 +1,9 @@
 ---
+title: "sigmoids"
 output: html_document
 ---
 
-[Link to the Rmd file on GitHub](https://gist.github.com/vladpetyuk/b4d15b1a2bcd16e33288)
+[Link to the Rmd file on GitHub](https://github.com/vladpetyuk/snippets/blob/master/sigmoids.Rmd)
 
 ### Sigmoid Function
 
