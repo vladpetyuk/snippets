@@ -1,0 +1,100 @@
+---
+output: html_document
+---
+
+[Link to the Rmd file on GitHub](https://gist.github.com/vladpetyuk/b4d15b1a2bcd16e33288)
+
+### Sigmoid Function
+
+### $\frac{p_1}{(1+e^{-p_2 \times (x - p_3)})}$
+
+`p1` is the full scale from 0 to p1. For logistic regression it is 1.
+In the later examples it will be hardcoded as 1.
+
+`p2` is the sharpness of change.
+
+`p3` x position of the 50% height.
+
+```{r chunk1}
+sigmoid = function(x, p1, p2, p3) {p1 / (1 + exp(-p2 * (x - p3)))}
+curve(sigmoid(x, p1=1, p2=2, p3=-3), from=-10, to=+10)
+abline(v=-3, lty=2)
+```
+
+
+
+
+***
+
+### Sigmoid that starts at zero.
+
+Sometimes we want to convert a parameter that varies only as $(0,+\infty)$
+instead of $(-\infty,+\infty)$. First, to convert `x` form $(0,+\infty)$ to 
+$(-\infty,+\infty)$ we'll take the `log`. The formular for the sigmoid/logistic curve 
+will be transformed as...
+
+### $\frac{1}{(1+e^{-p_2 \times (log(\frac{x}{p_3}))})}$
+
+```{r chunk1a}
+sigmoid2 = function(x, p2, p3) {1 / (1 + exp(-p2 * (log(x/p3))))}
+curve(sigmoid2(x, p2=20, p3=3), from=0.01, to=+10)
+abline(v=3, lty=2)
+```
+
+
+***
+
+### Transformed Positive Sigmoid
+
+If we move `p2` inside the `log` followed by logarithm exponentiation we'll get
+
+### $\frac{1}{1+(\frac{p_3}{x})^{p_2}}$
+
+```{r chunk1b}
+sigmoid3 = function(x, p2, p3) {1 / (1 + (p3/x)^p2)}
+curve(sigmoid3(x, p2=20, p3=3), from=0.01, to=+10)
+abline(v=3, lty=2)
+# smoother
+curve(sigmoid3(x, p2=4, p3=3), from=0.01, to=+10, add=T, col='navyblue')
+```
+
+
+In case we need to model an opposite dependency the trend has to be reversed.
+For example we want to formalize a probablity of chemical compound being missed 
+in analysis as a function of intensity.
+
+### $\frac{1}{1+(\frac{x}{p_3})^{p_2}}$
+
+```{r chunk1c}
+sigmoid3 = function(x, p2, p3) {1 / (1 + (x/p3)^p2)}
+curve(sigmoid3(x, p2=20, p3=3), from=0.01, to=+10)
+abline(v=3, lty=2)
+# smoother
+curve(sigmoid3(x, p2=4, p3=3), from=0.01, to=+10, add=T, col='navyblue')
+```
+
+
+
+***
+
+### Arctangent
+
+Another way of modeling sigmoid dependency.
+
+### $\frac{2}{\pi} \times arctan((x-p3) \times p2)$
+
+The notation of parameters as above:
+
+`p2` - shaprness
+
+`p3` - position of 50% change
+
+```{r chunk2}
+sigmoid2 = function(x, sharpness, threshold) (2/pi)*atan((x-threshold)*sharpness)
+curve(sigmoid2(x, sharpness=1, threshold=2), from=-10, to=+10)
+curve(sigmoid2(x, sharpness=3, threshold=2), from=-10, to=+10, add=TRUE, col='blue')
+abline(v=2)
+```
+
+
+
