@@ -32,8 +32,14 @@ superclass, but replaces the parts corresponding to the superclass by the
 assigned `<-` value.
 ```{r}
 setIs("B", "A",
-      coerce = function(obj) {out <- new("A"); out@x <- obj@x; out@y='dummy'; out},
-      replace = function(obj, value) {obj@x <- value@x; obj})
+      coerce = function(obj) {
+          out <- new("A")
+          out@x <- obj@x
+          out@y='dummy' 
+          return(out)},
+      replace = function(obj, value) {
+          obj@x <- value@x
+          return(obj)})
 
 ```
 The relationship between the classes has been established. 
@@ -56,4 +62,8 @@ anotherA <- new("A", x=55, y="abc")
 as(instB, "A") <- anotherA
 show(instB)
 ```
-
+The replacement of `A` with `B` does not work, although that should be
+a simple replacement of @x slot (I think)
+```{r, error=TRUE}
+as(instA, "B") <- new("B", x=33)
+```
