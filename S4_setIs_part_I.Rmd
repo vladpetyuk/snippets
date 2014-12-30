@@ -1,0 +1,46 @@
+---
+title: "S4_setIs"
+output: html_document
+---
+
+`setIs` function is a way to establish relationship between the S4 classes.
+
+```{r}
+# To be superclass.
+setClass("A", slots=c(x="numeric"))
+# To be subclass.  It has more details - i.e. more slots
+setClass("B", slots=c(x="numeric", y="character"))
+```
+Let's take a look at classes
+```{r}
+getClass("A")
+getClass("B")
+```
+There is no simple or explicit relatioship between the classes. 
+Thus coercion won't work.
+```{r, error=TRUE}
+instA <- new("A", x=1)
+instB <- new("B", x=2, y="b")
+as(instA, "B")
+as(instB, "A")
+```
+Explicitely setting the inheritance relationship with `setIs`.
+Note, class `B` constains all the slots from class `A`.
+Thus coercing is trivial. Basically it is subsetting of `B` the slots
+```{r}
+# since slots of B is a subset of A 
+setIs("B", "A")  
+```
+Let's take a look at classes again. Now `B` is listed as subclass of `A`.
+```{r}
+getClass("A")
+getClass("B")
+```
+Now, coercion works both ways.
+```{r}
+as(instA, "B")
+as(instB, "A")
+```
+
+
+
