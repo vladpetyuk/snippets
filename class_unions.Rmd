@@ -1,0 +1,28 @@
+---
+title: "Use of S4 Class Unions"
+output: html_document
+---
+
+Let's say we have to classes that contain kind of similar info.
+In this case matrices under the same slot name.
+```{r}
+setClass("A", slots=c(x="matrix", y="numeric"))
+setClass("B", slots=c(x="matrix", z="character"))
+setClassUnion("AorB", members = c("A","B"))
+```
+
+Let's define an `image` method that dispatches on `AorB` class.
+```{r}
+setMethod("image", signature=c(x="AorB"),
+          definition=function(x) image(x@x))
+```
+
+```{r, fig.width=4, fig.height=4}
+instA <- new("A", x=matrix(1:100, ncol=10), y=33)
+instB <- new("B", x=matrix(rnorm(100), ncol=10), z="just some text")
+image(instA)
+image(instB)
+```
+
+Note, there is no need to define `image` method for two different signatures -
+`A` and `B`. Union `AorB` is enough.
