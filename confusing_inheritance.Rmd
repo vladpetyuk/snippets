@@ -1,0 +1,39 @@
+---
+title: "Attempt to Confuse Inheritance"
+output: html_document
+---
+
+Let's see if we can confuse R by defining a class with multiple parent classes,
+such that parents have methods with the same name (but doing slightly different
+things).
+```{r, results='hide'}
+setClass("parent1", slots=c(x="numeric"))
+setClass("parent2", slots=c(y="numeric"))
+setClass("parent3", slots=c(z="logical"))
+setClass("poorChild", contains=c("parent2", "parent1", "parent3"))
+setGeneric("icanconfuse", function(obj, ...) standardGeneric("icanconfuse"))
+setMethod("icanconfuse", signature = (obj="parent1"),
+          definition=function(obj) print("I am from parent 1"))
+setMethod("icanconfuse", signature = (obj="parent2"),
+          definition=function(obj) print("I am from parent 2"))
+setMethod("icanconfuse", signature = (obj="parent3"),
+          definition=function(obj) print("I am from parent 3"))
+```
+Let's create instances of all three superclasses and one subclass.
+```{r}
+instP1 <- new("parent1", x=11)
+instP2 <- new("parent2", y=11)
+instP3 <- new("parent3", z=TRUE)
+instCh <- new("poorChild", x=33, y=44, z=FALSE)
+```
+Applying `icanconfuse` method to parents
+```{r}
+icanconfuse(instP1)
+icanconfuse(instP2)
+icanconfuse(instP3)
+icanconfuse(instCh)
+```
+Well ... it didn't get confused.  Despite the fact that there are three 
+`icanconfuse` methods upstream the inheritance graph the ambiguity was resolved
+by simply picking the first one in line.  The order of parents defined by the
+way they provided in the `contains` argument of the `setClass` function.
